@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Ular VS Bot Ular</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@500&display=swap');
+    body {
+      font-family: 'Orbitron', sans-serif;
+      text-align: center;
+      background-color: #0d0d0d;
+      color: #00ffe1;
+      margin: 0;
+    }
+    h1 {
+      margin: 20px;
+      text-shadow: 0 0 10px #00ffe1;
+    }
+    canvas {
+      background-color: #000;
+      display: block;
+      margin: 20px auto;
+      border: 2px solid #00ffe1;
+      box-shadow: 0 0 20px #00ffe1;
+    }
+    
+    .controls {
+  display: grid;
+  grid-template-columns: repeat(3, 50px);
+  grid-template-rows: repeat(3, 50px);
+  justify-content: center;
+  align-items: center;
+  gap: 5px;
+  margin: 10px auto;
+}
+    
+    .controls button {
+      font-size: 18px;
+      padding: 10px;
+      background-color: #111;
+      color: #00ffe1;
+      border: 1px solid #00ffe1;
+      border-radius: 10px;
+      cursor: pointer;
+      box-shadow: 0 0 10px #00ffe1;
+    }
+    .controls button:hover {
+      background-color: #222;
+      box-shadow: 0 0 15px #00fff7;
+    }
+    #gameOver {
+      font-size: 28px;
+      margin-top: 20px;
+      color: red;
+      display: none;
+    }
+    #startButton {
+      font-size: 20px;
+      padding: 10px;
+      background-color: #111;
+      color: #00ffe1;
+      border: 1px solid #00ffe1;
+      border-radius: 5px;
+      cursor: pointer;
+      box-shadow: 0 0 10px #00ffe1;
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <h1>Ular VS Bot Ular</h1>
+  <canvas id="gameCanvas" width="300" height="400"></canvas>
+
+  <div class="controls">
+    <div></div>
+    <button onclick="changeDirection('up')">↑</button>
+    <div></div>
+    <button onclick="changeDirection('left')">←</button>
+    <div></div>
+    <button onclick="changeDirection('right')">→</button>
+    <div></div>
+    <button onclick="changeDirection('down')">↓</button>
+    <div></div>
+  </div>
+
+  <div id="gameOver">Game Over!</div>
+  <button id="startButton" onclick="startGame()">Mulai Lagi</button>
+
+  <script>
+    const canvas = document.getElementById('gameCanvas');
+    const ctx = canvas.getContext('2d');
+    const gridSize = 10;
+    const canvasWidth = canvas.width;
+    const canvasHeight = canvas.height;
+
+    let snake, bots, direction, nextDirection, food, gameInterval;
+
+    function startGame() {
+      snake = [{ x: 100, y: 100 }];
+      bots = [
+        [{ x: 200, y: 200 }],
+        [{ x: 50, y: 50 }],
+        [{ x: 250, y: 100 }]
+      ];
+      direction = { x: gridSize, y: 0 };
+      nextDirection = { x: gridSize, y: 0 };
+      food = spawnFood();
+
+      document.getElementById('gameOver').style.display = 'none';
+      document.getElementById('startButton').style.display = 'none';
+
+      clearInterval(gameInterval);
+      gameInterval = setInterval(draw, 100);
+    }
+
+    function draw() {
+      ctx.clearRect(0, 0, canvasWidth, canvasHeight);
+      direction = nextDirection;
+
+      moveSnake(snake, direction);
+      bots.forEach((bot, index) => moveBot(bot));
+
+      if (checkCollision(snake)) {
+        endGame();
+        return;
+      }
+
+      drawEntity(snake, '#00ffe1');
+      drawEntity(bots[0], '#ff00ff');
+      drawEntity(bots[1], '#00ff00');
+      drawEntity(bots[2], '#ff9900');
+      drawFood();
+    }
+
+    function drawEntity(entity, color) {
+      ctx.fillStyle = color;
+      entity.forEach(segment => ctx.fillRect(segment.x, segment.y, gridSize, gridSize));
+    }
+
+    function drawFood() {
+      ctx.fillStyle = '#ff0099';
+      ctx.fillRect(food.x, food.y, gridSize, gridSize);
+    }
+
+    function moveSnake(snakeEntity, dir) {
+      const head = { x: snakeEntity[0].x + dir.x, y: snakeEntity[0].y + dir.y };
+      snakeEntity.unshift(head);
+
+      if (head.x === food.x && head.y === food.y) {
+        food = spawnFood();
+      } else {
+        snakeEntity.pop();
+      }
+
+      if (head.x >= canvasWidth) head.x = 0;
+      if (head.x < 0) head.x = canvasWidth - gridSize;
+      if (head.y >= canvasHeight) head.y = 0;
+      if (head.y < 0) head.y = canvasHeight - gridSize;
+    }
+
+    function spawnFood() {
+      return {
+        x: Math.floor(Math.random() * (canvasWidth / gridSize)) * gridSize,
+        y: Math.floor(Math.random() * (canvasHeight / gridSize)) * gridSize
+      };
+    }
+
+    function checkCollision(snakeEntity) {
+      const head = snakeEntity[0];
+      return snakeEntity.slice(1).some(segment => segment.x === head.x && segment.y === head.y);
+    }
+
+    function endGame() {
+      clearInterval(gameInterval);
+      document.getElementById('gameOver').style.display = 'block';
+      document.getElementById('startButton').style.display = 'inline-block';
+    }
+
+    function changeDirection(newDir) {
+      if (newDir === 'up' && direction.y === 0) {
+        nextDirection = { x: 0, y: -gridSize };
+      } else if (newDir === 'down' && direction.y === 0) {
+        nextDirection = { x: 0, y: gridSize };
+      } else if (newDir === 'left' && direction.x === 0) {
+        nextDirection = { x: -gridSize, y: 0 };
+      } else if (newDir === 'right' && direction.x === 0) {
+        nextDirection = { x: gridSize, y: 0 };
+      }
+    }
+
+    function moveBot(botEntity) {
+      const head = botEntity[0];
+      const dx = food.x - head.x;
+      const dy = food.y - head.y;
+      const dirX = dx !== 0 ? dx / Math.abs(dx) : 0;
+      const dirY = dy !== 0 ? dy / Math.abs(dy) : 0;
+
+      const tryDirs = [
+        { x: dirX * gridSize, y: 0 },
+        { x: 0, y: dirY * gridSize },
+        { x: -dirX * gridSize, y: 0 },
+        { x: 0, y: -dirY * gridSize }
+      ];
+
+      for (let dir of tryDirs) {
+        const nextX = head.x + dir.x;
+        const nextY = head.y + dir.y;
+        if (!botEntity.some(seg => seg.x === nextX && seg.y === nextY)) {
+          moveSnake(botEntity, dir);
+          return;
+        }
+      }
+
+      moveSnake(botEntity, { x: dirX * gridSize, y: 0 });
+    }
+
+    startGame();
+  </script>
+</body>
+</html>

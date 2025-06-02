@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Kunci Layar</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@600&display=swap');
+
+    body {
+      margin: 0;
+      padding: 0;
+      background: black;
+      overflow: hidden;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      font-family: 'Orbitron', sans-serif;
+    }
+
+    .btn-wrapper {
+      position: relative;
+      z-index: 2;
+      perspective: 800px;
+      transform-style: preserve-3d;
+    }
+
+    button {
+      font-size: 1.5em;
+      padding: 15px 40px;
+      border: 2px solid cyan;
+      background: transparent;
+      color: cyan;
+      cursor: pointer;
+      border-radius: 12px;
+      box-shadow: 0 0 10px cyan, 0 0 30px cyan;
+      transition: all 0.3s ease;
+      text-shadow: 0 0 10px cyan;
+      position: relative;
+      z-index: 3;
+      animation: rotate 6s infinite linear;
+      transform: rotateX(20deg) rotateY(-20deg);
+    }
+
+    button:hover {
+      background: cyan;
+      color: black;
+      box-shadow: 0 0 40px cyan;
+    }
+
+    .cyber-grid {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      background: radial-gradient(circle, rgba(0,255,255,0.1) 0%, rgba(0,255,255,0) 80%);
+      background-size: cover;
+      z-index: -1;
+    }
+
+    .lines {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      background: repeating-linear-gradient(
+        to top,
+        rgba(0, 255, 255, 0.07),
+        rgba(0, 255, 255, 0.07) 1px,
+        transparent 1px,
+        transparent 20px
+      );
+      z-index: -2;
+    }
+
+    .particles {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      z-index: 1;
+      pointer-events: none;
+    }
+
+    .particle {
+      position: absolute;
+      width: 10px;
+      height: 10px;
+      background: cyan;
+      border-radius: 50%;
+      opacity: 0;
+      animation: fadeIn 1s ease forwards;
+    }
+
+    .orbit {
+      position: absolute;
+      width: 0;
+      height: 0;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      animation: orbit 8s linear infinite;
+    }
+
+    .orbit.kumpul {
+      animation: none;
+    }
+
+    .particle.kumpul {
+      transform: translate(0, 0) !important;
+      transition: transform 1s ease;
+    }
+
+    @keyframes fadeIn {
+      to {
+        opacity: 1;
+      }
+    }
+
+    @keyframes orbit {
+      from {
+        transform: translate(-50%, -50%) rotate(0deg);
+      }
+      to {
+        transform: translate(-50%, -50%) rotate(360deg);
+      }
+    }
+
+    @keyframes rotate {
+      from {
+        transform: rotateX(20deg) rotateY(0deg);
+      }
+      to {
+        transform: rotateX(20deg) rotateY(360deg);
+      }
+    }
+
+    #cyberRain {
+      position: fixed;
+      top: 0;
+      left: 0;
+      z-index: 0;
+      pointer-events: none;
+    }
+  </style>
+</head>
+<body>
+  <canvas id="cyberRain"></canvas>
+
+  <div class="btn-wrapper">
+    <button onclick="masuk()">Masuk</button>
+  </div>
+  <div class="cyber-grid"></div>
+  <div class="lines"></div>
+  <div class="particles" id="particles"></div>
+
+  <script>
+    function masuk() {
+      const orbits = document.querySelectorAll('.orbit');
+      const particles = document.querySelectorAll('.particle');
+
+      orbits.forEach(orbit => orbit.classList.add('kumpul'));
+      particles.forEach(p => p.classList.add('kumpul'));
+
+      setTimeout(() => {
+        window.location.href = "halaman_kumpulan-aplikasi.html";
+      }, 1200);
+    }
+
+    const container = document.getElementById('particles');
+    const screenWidth = window.innerWidth;
+    const totalParticles = Math.floor(screenWidth / 4);
+    const radius = screenWidth * 0.4;
+
+    for (let i = 0; i < totalParticles; i++) {
+      const orbit = document.createElement('div');
+      orbit.classList.add('orbit');
+      orbit.style.animationDelay = (Math.random() * 1.5) + 's';
+      orbit.style.animationDuration = (3 + Math.random() * 2) + 's';
+
+      const particle = document.createElement('div');
+      particle.classList.add('particle');
+
+      const angle = (360 / totalParticles) * i;
+      const rad = angle * (Math.PI / 180);
+
+      const x = Math.cos(rad) * radius;
+      const y = Math.sin(rad) * radius;
+
+      particle.style.transform = `translate(${x}px, ${y}px)`;
+      orbit.appendChild(particle);
+      container.appendChild(orbit);
+    }
+
+    // Cyber Rain Effect
+    const canvas = document.getElementById('cyberRain');
+    const ctx = canvas.getContext('2d');
+
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+
+    const rainDrops = [];
+    const totalDrops = 150;
+
+    for (let i = 0; i < totalDrops; i++) {
+      rainDrops.push({
+        x: Math.random() * canvas.width,
+        y: Math.random() * canvas.height,
+        length: 10 + Math.random() * 20,
+        speed: 2 + Math.random() * 4,
+        opacity: Math.random() * 0.5 + 0.3
+      });
+    }
+
+    function drawRain() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.lineWidth = 1;
+
+      rainDrops.forEach(drop => {
+        ctx.beginPath();
+        ctx.moveTo(drop.x, drop.y);
+        ctx.lineTo(drop.x, drop.y + drop.length);
+        ctx.strokeStyle = `rgba(0, 255, 255, ${drop.opacity})`;
+        ctx.stroke();
+
+        drop.y += drop.speed;
+        if (drop.y > canvas.height) {
+          drop.y = -drop.length;
+          drop.x = Math.random() * canvas.width;
+        }
+      });
+
+      requestAnimationFrame(drawRain);
+    }
+
+    drawRain();
+  </script>
+</body>
+</html>

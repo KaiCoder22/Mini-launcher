@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Tulis & Edit Kode</title>
+  <style>
+    body {
+      background: #0a0a0a;
+      color: #00ffff;
+      font-family: 'Courier New', Courier, monospace;
+      text-align: center;
+      padding: 10px;
+    }
+
+    h1, h2 {
+      text-shadow: 0 0 15px #00ffff;
+    }
+
+    label, select {
+      font-size: 18px;
+      margin: 10px;
+    }
+
+    select {
+      background: #111;
+      color: #00ffff;
+      border: 2px solid #00ffff;
+      border-radius: 10px;
+      padding: 5px 10px;
+      box-shadow: 0 0 12px #00ffff;
+    }
+
+    .section-title {
+      font-size: 20px;
+      margin-top: 20px;
+      color: #00ffff;
+      text-shadow: 0 0 8px #00ffff;
+    }
+
+    textarea {
+      width: 95%;
+      height: 500px;
+      margin: 10px 0 20px 0;
+      background: #111;
+      color: #00ffff;
+      border: 2px solid #00ffff;
+      border-radius: 10px;
+      padding: 10px;
+      box-shadow: 0 0 10px #00ffff;
+      resize: vertical;
+    }
+
+    button {
+      background: #00ffff;
+      border: none;
+      padding: 12px 25px;
+      font-size: 16px;
+      color: #000;
+      border-radius: 10px;
+      cursor: pointer;
+      box-shadow: 0 0 15px #00ffff;
+      margin-top: 10px;
+    }
+
+    iframe {
+      width: 95%;
+      height: 400px;
+      margin-top: 20px;
+      border: 2px solid #00ffff;
+      border-radius: 10px;
+      background: #000;
+    }
+  </style>
+</head>
+<body>
+  <h1>Kai</h1>
+  <h2>Tulis & Edit Kode</h2>
+
+  <label for="theme">Pilih Warna Tema:</label>
+  <select id="theme" onchange="changeTheme(this.value)">
+    <option value="#00ffff" selected>Cyan</option>
+    <option value="#39ff14">Lime Neon</option>
+    <option value="#00bfff">Biru Elektrik</option>
+    <option value="#ff00ff">Ungu Neon</option>
+    <option value="#ffffff">Putih</option>
+    <option value="#ff3131">Merah Neon</option>
+    <option value="#1f51ff">Biru Tua</option>
+    <option value="#ffff33">Kuning Neon</option>
+    <option value="#ff9900">Oranye Neon</option>
+    <option value="#ff66cc">Pink Neon</option>
+  </select>
+
+  <div class="section-title">HTML</div>
+  <textarea id="html" placeholder="Tulis HTML di sini..."></textarea>
+
+  <div class="section-title">CSS</div>
+  <textarea id="css" placeholder="Tulis CSS di sini..."></textarea>
+
+  <div class="section-title">JavaScript</div>
+  <textarea id="js" placeholder="Tulis JavaScript di sini..."></textarea>
+
+  <button onclick="runCode()">Run</button>
+
+  <iframe id="output"></iframe>
+
+  <script>
+    function runCode() {
+      const html = document.getElementById("html").value;
+      const css = `<style>${document.getElementById("css").value}</style>`;
+      const js = `<script>${document.getElementById("js").value}<\/script>`;
+      const output = document.getElementById("output");
+      output.srcdoc = html + css + js;
+    }
+
+    function changeTheme(color) {
+      const elements = document.querySelectorAll("h1, h2, label, .section-title, textarea, button, iframe, select");
+      elements.forEach(el => {
+        el.style.color = color;
+        el.style.borderColor = color;
+        el.style.boxShadow = `0 0 12px ${color}`;
+      });
+
+      const button = document.querySelector("button");
+      button.style.background = color;
+      button.style.color = (color === "#ffffff" || color === "#ffff33") ? "#000" : "#111";
+    }
+  </script>
+</body>
+</html>

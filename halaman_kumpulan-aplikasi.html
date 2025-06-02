@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Kumpulan Aplikasi</title>
+  <style>
+    body {
+      margin: 0;
+      background: #121212;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      color: white;
+      overflow-x: auto;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    .top-bar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      background: rgba(0, 0, 0, 0.7);
+      color: #00FFAB;
+      padding: 10px 15px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 12px;
+      z-index: 10;
+    }
+
+    .top-bar .time {
+      font-size: 14px;
+      font-weight: bold;
+    }
+
+    .search-bar {
+      padding: 50px 15px 10px 15px;
+      text-align: center;
+    }
+
+    .search-bar input {
+      width: 85%;
+      padding: 7px 12px;
+      font-size: 13px;
+      border-radius: 15px;
+      border: 2px solid #333;
+      background: #1e1e1e;
+      color: white;
+      outline: none;
+    }
+
+    .icons {
+      margin-top: 10px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      padding: 0 10px 20px 10px;
+      justify-content: center;
+    }
+
+    .app-container {
+      text-align: center;
+      width: 48px;
+    }
+
+    .icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: linear-gradient(145deg, #6a11cb, #2575fc);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+      text-decoration: none;
+      margin: auto;
+      transition: transform 0.3s ease;
+    }
+
+    .icon:hover {
+      transform: scale(1.05);
+    }
+
+    .icon img {
+      width: 24px;
+      height: 24px;
+    }
+
+    .label {
+      font-size: 10px;
+      color: white;
+      margin-top: 4px;
+    }
+
+    .no-results {
+      text-align: center;
+      color: white;
+      font-size: 14px;
+      margin-top: 15px;
+      display: none;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="top-bar">
+    <div class="time" id="currentTime"></div>
+    <div class="date-time" id="dateTime"></div>
+  </div>
+
+  <div class="search-bar">
+    <input type="text" id="search" placeholder="Cari aplikasi..." oninput="searchApp()">
+  </div>
+
+  <div class="no-results" id="noResultsMessage">
+    Tidak ditemukan aplikasi yang cocok dengan "<span id="searchQuery"></span>"
+  </div>
+  
+  <div class="icons" id="appList">
+    <div class="app-container">
+      <a href="bahasa-terbalik.html" class="icon">
+        <img src="https://i.postimg.cc/rsY712fB/IMG-20250418-122416.jpg" />
+      </a>
+      <div class="label">Bahasa Terbalik</div>
+    </div>
+    
+    <div class="app-container">
+      <a href="batu-gunting-kertas.html" class="icon">
+        <img src="https://i.postimg.cc/QN1mmLqH/IMG-20250419-204008.jpg" />
+      </a>
+      <div class="label">Batu Gunting Kertas</div>
+    </div>
+
+    <div class="app-container">
+      <a href="catatan.html" class="icon">
+        <img src="https://img.icons8.com/color/96/note.png" />
+      </a>
+      <div class="label">Catatan</div>
+    </div>
+
+    <div class="app-container">
+      <a href="campur_warna.html" class="icon">
+        <img src="https://i.postimg.cc/XYFSZ5L7/IMG-20250417-233557.jpg">
+      </a>
+      <div class="label">Campur Warna</div>
+    </div>
+
+    <div class="app-container">
+      <a href="galeri.html" class="icon">
+        <img src="https://img.icons8.com/fluency/96/image-gallery.png" />
+      </a>
+      <div class="label">Galeri</div>
+    </div>
+    
+    <div class="app-container">
+      <a href="grafik-nilai.html" class="icon">
+        <img src="https://i.postimg.cc/QCBLL98Y/IMG-20250418-211639.jpg" />
+      </a>
+      <div class="label">Grafik Nilai</div>
+    </div>
+
+    <div class="app-container">
+      <a href="jam.html" class="icon">
+        <img src="https://img.icons8.com/color/96/clock--v1.png" />
+      </a>
+      <div class="label">Jam</div>
+    </div>
+
+    <div class="app-container">
+      <a href="jadwal.html" class="icon">
+        <img src="https://img.icons8.com/color/96/planner.png" />
+      </a>
+      <div class="label">Jadwal</div>
+    </div>
+
+    <div class="app-container">
+      <a href="kamera.html" class="icon">
+        <img src="https://img.icons8.com/color/96/camera--v1.png" />
+      </a>
+      <div class="label">Kamera</div>
+    </div>
+
+    <div class="app-container">
+      <a href="kalender.html" class="icon">
+        <img src="https://img.icons8.com/color/96/calendar--v1.png" />
+      </a>
+      <div class="label">Kalender</div>
+    </div>
+
+    <div class="app-container">
+      <a href="kalkulator.html" class="icon">
+        <img src="https://img.icons8.com/color/96/calculator.png" />
+      </a>
+      <div class="label">Kalkulator</div>
+    </div>
+
+    <div class="app-container">
+      <a href="kompas.html" class="icon">
+        <img src="https://img.icons8.com/color/96/compass--v1.png" />
+      </a>
+      <div class="label">Kompas</div>
+    </div>
+
+    <div class="app-container">
+      <a href="labirin.html" class="icon">
+        <img src="https://i.postimg.cc/8c3hJkpy/labirin.jpg"/>
+      </a>
+      <div class="label">Labirin</div>
+    </div>
+    
+    <div class="app-container">
+      <a href="memory_game.html" class="icon">
+        <img src="https://i.postimg.cc/5tPqs8W6/IMG-20250416-203555.jpg" />
+      </a>
+      <div class="label">Memori Buah</div>
+    </div>
+
+    <div class="app-container">
+      <a href="enkripsi-pesan.html" class="icon">
+        <img src="https://i.postimg.cc/q7nZpYLV/IMG-20250416-111404.jpg" />
+      </a>
+      <div class="label">Pengubah Pesan</div>
+    </div>
+
+    <div class="app-container">
+      <a href="musik.html" class="icon">
+        <img src="https://i.postimg.cc/0yqTXFJ4/IMG-20250416-143018.jpg" />
+      </a>
+      <div class="label">Putar Link YouTube</div>
+    </div>
+
+    <div class="app-container">
+      <a href="codeplay.html" class="icon">
+        <img src="https://i.postimg.cc/PJcTrvjJ/IMG-20250416-193217.jpg" />
+      </a>
+      <div class="label">Salin Coding</div>
+    </div>
+
+    <div class="app-container">
+      <a href="catch_the_ball.html" class="icon">
+        <img src="https://i.postimg.cc/J4vqtxt1/bolajatuh.jpg" />
+      </a>
+      <div class="label">Tangkap Bola</div>
+    </div>
+    
+    <div class="app-container">
+      <a href="tempat-nulis-coding.html" class="icon">
+        <img src="https://img.icons8.com/color/96/source-code.png" />
+      </a>
+      <div class="label">Tulis & Edit Kode</div>
+    </div>
+
+    <div class="app-container">
+  <a href="ular.html" class="icon">
+    <img src="https://i.postimg.cc/V6Kwsmv6/IMG-20250419-155020.jpg" />
+  </a>
+  <div class="label">Ular VS Bot Ular</div>
+</div>
+
+  <script>
+    function updateDateTime() {
+      const dateTimeElement = document.getElementById('dateTime');
+      const timeElement = document.getElementById('currentTime');
+      const currentDate = new Date();
+
+      const dayNames = ["Ming", "Sen", "Sel", "Rab", "Kam", "Jum", "Sab"];
+      const day = dayNames[currentDate.getDay()];
+      const date = currentDate.getDate().toString().padStart(2, '0');
+      const month = (currentDate.getMonth() + 1).toString().padStart(2, '0');
+      const year = currentDate.getFullYear();
+
+      const hours = currentDate.getHours().toString().padStart(2, '0');
+      const minutes = currentDate.getMinutes().toString().padStart(2, '0');
+      const seconds = currentDate.getSeconds().toString().padStart(2, '0');
+
+      timeElement.textContent = `${hours}:${minutes}:${seconds}`;
+      dateTimeElement.textContent = `${day}, ${date}-${month}-${year}`;
+    }
+
+    setInterval(updateDateTime, 1000);
+    updateDateTime();
+
+    function searchApp() {
+      const input = document.getElementById('search').value.toLowerCase();
+      const apps = document.querySelectorAll('.app-container');
+      const noResults = document.getElementById('noResultsMessage');
+      const queryText = document.getElementById('searchQuery');
+
+      let found = false;
+
+      apps.forEach(app => {
+        const label = app.querySelector('.label').textContent.toLowerCase();
+        if (label.includes(input)) {
+          app.style.display = 'inline-block';
+          found = true;
+        } else {
+          app.style.display = 'none';
+        }
+      });
+
+      if (!found && input !== '') {
+        noResults.style.display = 'block';
+        queryText.textContent = input;
+      } else {
+        noResults.style.display = 'none';
+        queryText.textContent = '';
+      }
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,320 @@
+<!DOCTYPE html>  <html lang="id">  
+<head>  
+    <meta charset="UTF-8">  
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">  
+    <title>Game Labirin</title>  
+    <style>  
+        body {  
+            text-align: center;  
+            background-color: black;  
+            color: white;  
+            font-family: Arial, sans-serif;  
+        }  h1 {  
+        font-size: 32px;  
+        font-weight: bold;  
+        transition: color 0.3s ease-in-out;  
+    }  
+
+    canvas {  
+        border: 2px solid white;  
+        background-color: black;  
+    }  
+
+    .controls {  
+        margin-top: 10px;  
+    }  
+
+    button {  
+        font-size: 20px;  
+        padding: 10px;  
+        margin: 5px;  
+        cursor: pointer;  
+        transition: background-color 0.3s ease;  
+    }  
+
+    #messageBox {  
+        display: none;  
+        background: linear-gradient(to right, #a0c4ff, #a3f7ff, #b4e7b4, #d0a1ff);  
+        color: black;  
+        padding: 20px;  
+        margin-top: 20px;  
+        border-radius: 8px;  
+        font-size: 18px;  
+    }  
+
+    #restartButton {  
+        display: none;  
+        margin-top: 20px;  
+        font-size: 18px;  
+        padding: 10px;  
+        cursor: pointer;  
+        background: radial-gradient(circle, #a0c4ff, #a3f7ff, #b4e7b4, #d0a1ff);  
+    }  
+
+    .disabled {  
+        cursor: not-allowed;  
+        opacity: 0.5;  
+    }  
+
+    /* Efek Salju */  
+    .snowflake {  
+        position: absolute;  
+        top: -10px;  
+        color: white;  
+        font-size: 20px;  
+        opacity: 0.8;  
+        user-select: none;  
+        animation: fall linear infinite;  
+    }  
+
+    @keyframes fall {  
+        to {  
+            transform: translateY(100vh);  
+        }  
+    }  
+
+    /* Tombol Home */  
+    button.home-btn {  
+        background-color: #3498db;  
+        color: white;  
+        border: none;  
+        padding: 6px 10px; /* Ukuran tombol */  
+        font-size: 16px;  
+        cursor: pointer;  
+        border-radius: 5px;  
+        position: absolute;  
+        top: 2%;  
+        left: 8%;  
+        transform: translate(-50%, -50%); /* Membuat tombol tepat di tengah */  
+        z-index: 10; /* Supaya di atas elemen lain */  
+        animation: home-btn 3s infinite; /* Menambahkan animasi perubahan warna */  
+    }  
+
+    /* Animasi perubahan warna */  
+    @keyframes home-btn {  
+        0% { background-color: #00ff00; }  
+        20% { background-color: #00ffff; }  
+        40% { background-color: #ff00ff; }  
+        60% { background-color: #ffcc00; }  
+        80% { background-color: #ff0000; }  
+        100% { background-color: #00ff00; }  
+    }  
+</style>
+
+</head>  
+<body>  
+    <div id="home-btn-container">  
+        <button class="home-btn" onclick="goHome()">Home</button>  
+    </div>  <h1 id="title">Game Labirin</h1>  
+<canvas id="mazeCanvas"></canvas>  
+
+<div class="controls">  
+    <button id="upButton" onclick="move('up')">↑</button>  
+    <div>  
+        <button id="leftButton" onclick="move('left')">←</button>  
+        <button id="downButton" onclick="move('down')">↓</button>  
+        <button id="rightButton" onclick="move('right')">→</button>  
+    </div>  
+</div>  
+
+<!-- Kotak pesan -->  
+<div id="messageBox">  
+    <span>Selamat! Anda telah membantu seseorang mendapatkan uang 🤑💰📈</span>  
+</div>  
+
+<!-- Tombol Main Lagi -->  
+<button id="restartButton" onclick="restartGame()">Main Lagi</button>  
+
+<script>  
+    const canvas = document.getElementById("mazeCanvas");  
+    const ctx = canvas.getContext("2d");  
+
+    const maze = [  
+"111111111111111111111",  
+"1S0000000000000000001",  
+"101111101010111110101",  
+"100000101010000010001",  
+"111110101011111010111",  
+"100010100000001010001",  
+"101010111110101010101",  
+"101010000010101000101",  
+"101011111010101011101",  
+"101000000010100000101",  
+"111110111110101111101",  
+"100000100000101000001",  
+"101111101110101011111",  
+"100000001000000010001",  
+"111110101010111111101",  
+"100010101000001010001",  
+"101010111110101010101",  
+"101000000100001000101",  
+"101011111110101011101",  
+"101000101010100000101",  
+"111110101010101111101",  
+"100000101000100000001",  
+"101110101110111111101",  
+"100100000010000000101",  
+"110101111011101111101",  
+"100100000010100000001",  
+"101111101110101011111",  
+"100010000000001010001",  
+"111010101010101011101",  
+"100010001010001000001",  
+"101010111010101010101",  
+"101010101010101010111",  
+"1000000000001000100E1",  
+"111111111111111111111"
+
+];
+
+const cellSize = 15;  
+    canvas.width = maze[0].length * cellSize;  
+    canvas.height = maze.length * cellSize;  
+
+    let player = { x: 1, y: 1 };  
+    let gameOver = false;  
+
+    function drawMaze() {  
+        ctx.clearRect(0, 0, canvas.width, canvas.height);  
+        for (let y = 0; y < maze.length; y++) {  
+            for (let x = 0; x < maze[y].length; x++) {  
+                if (maze[y][x] === "1") {  
+                    ctx.fillStyle = "white";  
+                    ctx.fillRect(x * cellSize, y * cellSize, cellSize, cellSize);  
+                }  
+            }  
+        }  
+
+        // Gambar emoji rumah sebagai tujuan  
+        ctx.font = "12px Arial";  
+        ctx.fillText("💰", (maze[0].length - 2) * cellSize + 2, (maze.length - 2) * cellSize + 12);  
+
+        // Gambar pemain  
+        ctx.fillStyle = "yellow";  
+        ctx.fillText("🤑", player.x * cellSize + 2, player.y * cellSize + 12);  
+    }  
+
+    function move(direction) {  
+        if (gameOver) return;  
+
+        let newX = player.x;  
+        let newY = player.y;  
+
+        if (direction === "up") newY--;  
+        if (direction === "down") newY++;  
+        if (direction === "left") newX--;  
+        if (direction === "right") newX++;  
+
+        if (maze[newY][newX] !== "1") {  
+            player.x = newX;  
+            player.y = newY;  
+        }  
+
+        drawMaze();  
+
+        if (maze[player.y][player.x] === "E") {  
+            gameOver = true;  
+            document.getElementById("messageBox").style.display = "block";  
+            document.getElementById("restartButton").style.display = "inline-block";  
+            disableControls();  
+        }  
+    }  
+
+    function changeTitleColor() {  
+        const colors = ["#0ff", "#0f0", "#f0f", "#ff0", "#f00", "#00f"];  
+        let index = 0;  
+
+        setInterval(() => {  
+            document.getElementById("title").style.color = colors[index];  
+            index = (index + 1) % colors.length;  
+        }, 500);  
+    }  
+
+    function restartGame() {  
+        document.getElementById("messageBox").style.display = "none";  
+        document.getElementById("restartButton").style.display = "none";  
+        player.x = 1;  
+        player.y = 1;  
+        gameOver = false;  
+        drawMaze();  
+        enableControls();  
+    }  
+
+    function disableControls() {  
+        document.getElementById("upButton").classList.add("disabled");  
+        document.getElementById("leftButton").classList.add("disabled");  
+        document.getElementById("downButton").classList.add("disabled");  
+        document.getElementById("rightButton").classList.add("disabled");  
+    }  
+
+    function enableControls() {  
+        document.getElementById("upButton").classList.remove("disabled");  
+        document.getElementById("leftButton").classList.remove("disabled");  
+        document.getElementById("downButton").classList.remove("disabled");  
+        document.getElementById("rightButton").classList.remove("disabled");  
+    }  
+
+    drawMaze();  
+    changeTitleColor();  
+
+    // Efek Salju  
+    function createSnowflake() {  
+        const snowflake = document.createElement("div");  
+        snowflake.classList.add("snowflake");  
+        snowflake.innerHTML = "*";  
+        snowflake.style.left = Math.random() * window.innerWidth + "px";  
+        snowflake.style.animationDuration = (Math.random() * 4 + 3) + "s";  
+        snowflake.style.fontSize = Math.random() * 15 + 15 + "px";  
+        document.body.appendChild(snowflake);  
+
+        setTimeout(() => {  
+            snowflake.remove();  
+        }, 6000);  
+    }  
+
+    function generateSnow() {  
+        setInterval(createSnowflake, 200);  
+    }  
+
+    generateSnow();  
+
+    function goHome() {  
+        window.location.href = "index.html"; // Ganti dengan halaman utama yang sesuai  
+    }  
+      
+    function drawMaze() {  
+ctx.clearRect(0, 0, canvas.width, canvas.height);  
+for (let y = 0; y < maze.length; y++) {  
+    for (let x = 0; x < maze[y].length; x++) {  
+        if (maze[y][x] === "1") {  
+            // Gabungan warna untuk dinding  
+            const color1 = "#ff7f7f";  
+            const color2 = "#7f7fff";  
+            const color3 = "#7fff7f";  
+            const color4 = "#ffff7f";  
+            const color5 = "#ff7fff";  
+            const color6 = "#7f7f7f";  
+            const gradient = ctx.createLinearGradient(x * cellSize, y * cellSize, (x + 1) * cellSize, (y + 1) * cellSize);  
+            gradient.addColorStop(0, color1);  
+            gradient.addColorStop(0.5, color2);  
+            gradient.addColorStop(1, color3);  
+
+            ctx.fillStyle = gradient;  
+            ctx.fillRect(x * cellSize, y * cellSize, cellSize, cellSize);  
+        }  
+    }  
+}  
+
+// Gambar emoji rumah sebagai tujuan  
+ctx.font = "12px Arial";  
+ctx.fillText("💰", (maze[0].length - 2) * cellSize + 2, (maze.length - 2) * cellSize + 12);  
+
+// Gambar pemain  
+ctx.fillStyle = "yellow";  
+ctx.fillText("🤑", player.x * cellSize + 2, player.y * cellSize + 12);
+
+}
+</script>
+
+</body>  
+</html>

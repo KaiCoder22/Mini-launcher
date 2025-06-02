@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Kompas Digital Akurat</title>
+  <style>
+    body {
+      background: #111;
+      color: white;
+      font-family: sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      margin: 0;
+    }
+
+    .kompas-container {
+      position: relative;
+      width: 250px;
+      height: 250px;
+      border: 4px solid white;
+      border-radius: 50%;
+    }
+
+    .arah-tulisan {
+      position: absolute;
+      font-weight: bold;
+      font-size: 16px;
+      color: white;
+    }
+
+    /* Arah utama */
+    .U { top: 5px; left: 50%; transform: translateX(-50%); }
+    .T { top: 50%; right: 5px; transform: translateY(-50%); }
+    .S { bottom: 5px; left: 50%; transform: translateX(-50%); }
+    .B { top: 50%; left: 5px; transform: translateY(-50%); }
+
+    /* Arah tambahan */
+    .NE { top: 20px; right: 20px; } /* Timur Laut */
+    .SE { bottom: 20px; right: 20px; } /* Tenggara */
+    .SW { bottom: 20px; left: 20px; } /* Barat Daya */
+    .NW { top: 20px; left: 20px; } /* Barat Laut */
+
+    .jarum-container {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      top: 0;
+      left: 0;
+      pointer-events: none;
+    }
+
+    .jarum {
+      width: 4px;
+      height: 120px;
+      background: red;
+      position: absolute;
+      top: 5px;
+      left: 50%;
+      transform: translateX(-50%) rotate(0deg);
+      transform-origin: bottom center;
+      transition: transform 0.5s ease;
+      z-index: 10;
+    }
+
+    .derajat {
+      margin-top: 20px;
+      font-size: 20px;
+    }
+
+    .arah-judul {
+      font-size: 20px;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+  <h2>Kompas Digital</h2>
+  <div class="kompas-container">
+    <!-- Arah tetap -->
+    <div class="arah-tulisan U">U</div>
+    <div class="arah-tulisan T">T</div>
+    <div class="arah-tulisan S">S</div>
+    <div class="arah-tulisan B">B</div>
+    <div class="arah-tulisan NE">UT</div>
+    <div class="arah-tulisan SE">TS</div>
+    <div class="arah-tulisan SW">SB</div>
+    <div class="arah-tulisan NW">BU</div>
+
+    <!-- Jarum bergerak -->
+    <div class="jarum-container">
+      <div class="jarum" id="jarum"></div>
+    </div>
+  </div>
+  <div class="derajat" id="derajat">0°</div>
+  <div class="arah-judul" id="arah-judul">Menghadap: -</div>
+
+  <script>
+    if (window.DeviceOrientationEvent) {
+      window.addEventListener("deviceorientation", function(event) {
+        let alpha = event.alpha; // Rotasi perangkat terhadap utara
+        let arah = alpha;
+        
+        // Jika webkitCompassHeading tersedia, gunakan untuk arah magnetik yang lebih akurat
+        if (event.webkitCompassHeading) {
+          arah = event.webkitCompassHeading;
+        }
+        
+        // Koreksi orientasi jika perlu
+        const jarum = document.getElementById("jarum");
+        jarum.style.transform = `translateX(-50%) rotate(${arah}deg)`;
+        
+        // Menampilkan nilai derajat
+        document.getElementById("derajat").textContent = `${Math.round(arah)}°`;
+
+        // Menampilkan arah mata angin dalam teks
+        const arahText = getArahText(arah);
+        document.getElementById("arah-judul").textContent = `Menghadap: ${arahText}`;
+      }, true);
+    } else {
+      alert("Kompas tidak didukung di perangkat ini.");
+    }
+
+    // Fungsi untuk menentukan arah berdasarkan derajat
+    function getArahText(arah) {
+      if (arah >= 337.5 || arah < 22.5) return "Utara (U)";
+      if (arah >= 22.5 && arah < 67.5) return "Timur Laut (NE)";
+      if (arah >= 67.5 && arah < 112.5) return "Timur (T)";
+      if (arah >= 112.5 && arah < 157.5) return "Tenggara (SE)";
+      if (arah >= 157.5 && arah < 202.5) return "Selatan (S)";
+      if (arah >= 202.5 && arah < 247.5) return "Barat Daya (SW)";
+      if (arah >= 247.5 && arah < 292.5) return "Barat (B)";
+      if (arah >= 292.5 && arah < 337.5) return "Barat Laut (NW)";
+    }
+  </script>
+</body>
+</html>

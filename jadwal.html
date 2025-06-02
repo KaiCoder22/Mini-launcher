@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>Jadwal</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Orbitron&display=swap');
+
+    body {
+      font-family: 'Orbitron', sans-serif;
+      background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+      color: #00ffff;
+      padding: 20px;
+      margin: 0;
+    }
+
+    .container {
+      max-width: 600px;
+      margin: auto;
+      background: rgba(0, 0, 0, 0.8);
+      padding: 30px;
+      border-radius: 16px;
+      box-shadow: 0 0 30px #00ffff88;
+    }
+
+    h2 {
+      text-align: center;
+      margin-bottom: 20px;
+      color: #00ffff;
+      text-shadow: 0 0 10px #00ffffaa;
+    }
+
+    .form-row {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-bottom: 15px;
+    }
+
+    .form-row input[type="text"],
+    .form-row input[type="time"] {
+      padding: 12px;
+      background: #112233;
+      color: #00ffff;
+      border: 1px solid #00ffff44;
+      border-radius: 10px;
+      font-family: 'Orbitron', sans-serif;
+      font-size: 16px;
+      box-shadow: inset 0 0 5px #00ffff44;
+      width: 100%;
+    }
+
+    button {
+      width: 100%;
+      padding: 12px;
+      margin-top: 10px;
+      background: #00ffff22;
+      color: #00ffff;
+      border: 1px solid #00ffff44;
+      border-radius: 10px;
+      font-family: 'Orbitron', sans-serif;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 0 10px #00ffff44;
+    }
+
+    button:hover {
+      background: #00ffff44;
+    }
+
+    ul {
+      list-style: none;
+      padding: 0;
+      margin-top: 20px;
+    }
+
+    .schedule-box {
+      background: #001f33;
+      padding: 15px;
+      margin-top: 15px;
+      border-radius: 12px;
+      box-shadow: 0 0 15px #00ffff66;
+    }
+
+    .schedule-box h3 {
+      margin-top: 0;
+      color: #00ffff;
+      text-align: center;
+    }
+
+    li {
+      background: #001f33;
+      margin-top: 10px;
+      padding: 12px;
+      border-left: 4px solid #00ffff;
+      border-radius: 8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 0 8px #00ffff44;
+    }
+
+    .delete {
+      background: transparent;
+      color: #ff4d4f;
+      border: none;
+      font-size: 16px;
+      padding: 2px 6px;
+      cursor: pointer;
+    }
+
+    .delete:hover {
+      color: #ff1a1a;
+    }
+
+    .reminder {
+  background: #001f33;
+  border: 2px solid #00ffff;
+  padding: 12px;
+  margin-top: 20px;
+  border-radius: 10px;
+  box-shadow: 0 0 10px #00ffffaa;
+  text-align: center;
+  display: none;
+  animation: blink 1s infinite;
+  white-space: normal; /* Membuat teks membungkus */
+  word-wrap: break-word; /* Memastikan teks panjang tidak keluar dari batas */
+}
+
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.3; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>Jadwal Harian Teknologi</h2>
+    <div class="form-row">
+      <input type="text" id="activity" placeholder="Kegiatan" />
+      <input type="time" id="time" />
+    </div>
+    <button onclick="addSchedule()">+ Tambah Jadwal</button>
+    
+    <!-- Kotak untuk Menampilkan Jadwal yang Dibuat -->
+    <div class="schedule-box">
+      <h3>Jadwal Anda</h3>
+      <ul id="scheduleList"></ul>
+    </div>
+    
+    <!-- Pesan Pengingat -->
+    <div class="reminder" id="reminderBox">Waktunya sekarang!</div>
+  </div>
+
+  <audio id="alarmSound" src="https://www.soundjay.com/buttons/sounds/beep-07.mp3" preload="auto"></audio>
+
+  <script>
+    let schedules = JSON.parse(localStorage.getItem("schedules") || "[]");
+
+    function saveSchedules() {
+      localStorage.setItem("schedules", JSON.stringify(schedules));
+    }
+
+    function renderSchedules() {
+      const list = document.getElementById("scheduleList");
+      list.innerHTML = "";
+      schedules.forEach(schedule => {
+        const li = document.createElement("li");
+        li.innerHTML = `
+          <span>${schedule.time} - ${schedule.activity}</span> 
+          <button class="delete" onclick="deleteSchedule('${schedule.time}', '${schedule.activity}')">🗑️</button>`;
+        list.appendChild(li);
+      });
+    }
+
+    function addSchedule() {
+      const activity = document.getElementById("activity").value;
+      const time = document.getElementById("time").value;
+
+      if (!activity || !time) {
+        alert("Isi kegiatan dan waktu!");
+        return;
+      }
+
+      schedules.push({ time, activity, triggered: false });
+      saveSchedules();
+      renderSchedules();
+
+      document.getElementById("activity").value = "";
+      document.getElementById("time").value = "";
+    }
+
+    function deleteSchedule(time, activity) {
+      schedules = schedules.filter(s => !(s.time === time && s.activity === activity));
+      saveSchedules();
+      renderSchedules();
+    }
+
+    function showReminder(message) {
+      const reminder = document.getElementById("reminderBox");
+      reminder.innerText = message;
+      reminder.style.display = "block";
+      setTimeout(() => {
+        reminder.style.display = "none";
+      }, 10000); // tampil 10 detik
+    }
+
+    setInterval(() => {
+      const now = new Date();
+      const currentTime = now.toTimeString().slice(0, 5);
+      schedules.forEach(schedule => {
+        if (schedule.time === currentTime && !schedule.triggered) {
+          const audio = document.getElementById("alarmSound");
+          audio.play();
+          showReminder(`[PENGINGAT] Waktunya: ${schedule.activity}`);
+          schedule.triggered = true;
+          saveSchedules();
+        }
+      });
+    }, 1000);
+
+    window.onload = () => {
+      renderSchedules();
+    };
+  </script>
+</body>
+</html>

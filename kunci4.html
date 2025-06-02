@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Kunci Layar</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background: #1a1a1a;
+      font-family: 'Courier New', monospace;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      color: #00ffff; /* Cyan Cerah */
+    }
+
+    .container {
+      background: rgba(0, 0, 0, 0.7);
+      padding: 20px;
+      border-radius: 15px;
+      text-align: center;
+      width: 90%;
+      max-width: 400px;
+      box-shadow: 0 0 20px #00ffff;
+      backdrop-filter: blur(8px);
+    }
+
+    h2 {
+      font-size: 18px;
+      margin-bottom: 15px;
+      text-shadow: 0 0 5px #00ffff, 0 0 10px #00ffff;
+    }
+
+    .pin-display {
+      font-size: 25px;
+      text-align: center;
+      letter-spacing: 10px;
+      color: #00ffff;
+      background: transparent;
+      border: 2px solid #00ffff;
+      border-radius: 10px;
+      padding: 10px;
+      text-shadow: 0 0 3px #00ffff;
+      margin: 20px 0;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 10px;
+    }
+
+    .grid button {
+      padding: 15px;
+      font-size: 18px;
+      background: transparent;
+      border: 2px solid #00ffff;
+      color: #00ffff;
+      border-radius: 15px;
+      cursor: pointer;
+      transition: background 0.3s ease, transform 0.3s ease;
+    }
+
+    .grid button:hover {
+      background: #00ffff;
+      color: #000;
+      transform: scale(1.1);
+    }
+
+    .grid button:active {
+      transform: scale(0.95);
+    }
+
+    .message {
+      margin-top: 20px;
+      font-size: 14px;
+      color: #ff6347;
+      opacity: 0.8;
+      transition: opacity 0.3s ease;
+    }
+
+    .shake {
+      animation: shake 0.5s ease-in-out;
+    }
+
+    @keyframes shake {
+      0% { transform: translateX(0); }
+      25% { transform: translateX(-10px); }
+      50% { transform: translateX(10px); }
+      75% { transform: translateX(-10px); }
+      100% { transform: translateX(0); }
+    }
+
+    .button-container {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 20px;
+    }
+
+    .button-container button {
+      width: 48%;
+    }
+
+    /* Mengatur Tombol Hapus dan OK di bawah grid */
+    .extra-buttons {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 20px;
+    }
+
+    .extra-buttons button {
+      width: 48%;
+      font-size: 18px;
+    }
+
+    /* Mengatur Tombol Hapus dan OK di dalam grid */
+    .grid .extra-button {
+      grid-column: span 2;
+    }
+
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>Masukkan Kata Kunci</h2>
+    <div class="pin-display" id="pin-display">-----</div>
+    <div class="grid">
+      <button onclick="addCharacter('A')">A</button>
+      <button onclick="addCharacter('B')">B</button>
+      <button onclick="addCharacter('C')">C</button>
+      <button onclick="addCharacter('D')">D</button>
+      <button onclick="addCharacter('E')">E</button>
+      <button onclick="addCharacter('F')">F</button>
+      <button onclick="addCharacter('G')">G</button>
+      <button onclick="addCharacter('H')">H</button>
+      <button onclick="addCharacter('I')">I</button>
+      <button onclick="addCharacter('J')">J</button>
+      <button onclick="addCharacter('K')">K</button>
+      <button onclick="addCharacter('L')">L</button>
+      <button onclick="addCharacter('M')">M</button>
+      <button onclick="addCharacter('N')">N</button>
+      <button onclick="addCharacter('O')">O</button>
+      <button onclick="addCharacter('P')">P</button>
+      <button onclick="addCharacter('Q')">Q</button>
+      <button onclick="addCharacter('R')">R</button>
+      <button onclick="addCharacter('S')">S</button>
+      <button onclick="addCharacter('T')">T</button>
+      <button onclick="addCharacter('U')">U</button>
+      <button onclick="addCharacter('V')">V</button>
+      <button onclick="addCharacter('W')">W</button>
+      <button onclick="addCharacter('X')">X</button>
+      <button onclick="addCharacter('Y')">Y</button>
+      <button onclick="addCharacter('Z')">Z</button>
+      <!-- Tombol Hapus dan OK -->
+      <button class="extra-button" onclick="clearPin()">Hapus</button>
+      <button class="extra-button" onclick="checkPin()">OK</button>
+    </div>
+
+    <div class="message" id="msg"></div>
+  </div>
+
+  <script>
+    let pin = '';
+
+    function addCharacter(character) {
+      if (pin.length < 5) { // Menambah karakter sampai 5
+        pin += character;
+        document.getElementById('pin-display').innerText = pin.padEnd(5, '-');
+      }
+    }
+
+    function clearPin() {
+      pin = '';
+      document.getElementById('pin-display').innerText = '-----';
+      document.getElementById('msg').innerText = ''; // Menghapus pesan kesalahan
+    }
+
+    function checkPin() {
+      const correctPin = 'SABAR'; // Sandi yang benar adalah ABCDE
+      const msg = document.getElementById('msg');
+
+      if (pin === correctPin) {
+        msg.innerText = "Akses diterima. Membuka sistem...";
+        msg.classList.remove("shake");
+        setTimeout(() => {
+          window.location.href = "masuk.html"; // Pindah ke halaman utama
+        }, 1500);
+      } else {
+        msg.innerText = "Kata Kunci salah. Coba lagi.";
+        msg.classList.add("shake"); // Efek goyang saat salah
+        setTimeout(() => {
+          clearPin();
+          msg.classList.remove("shake");
+        }, 1500);
+      }
+    }
+  </script>
+</body>
+</html>

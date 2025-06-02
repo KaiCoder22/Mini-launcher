@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Catch the Ball</title>
+    <style>
+        body {
+          /* Menata tombol home */
+.home-btn {
+  padding: 10px 20px;
+  font-size: 16px;
+  background-color: blue;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.container {
+    display: flex;
+    justify-content: center; /* Tengah secara horizontal */
+    align-items: center; /* Tengah secara vertikal (jika perlu) */
+    height: 100vh; /* Sesuai tinggi layar */
+}
+
+button {
+    padding: 10px 20px;
+    font-size: 16px;
+}
+
+.home-btn:hover {
+  background-color: #e53935;
+}
+          
+            margin: 0;
+            padding: 0;
+            background-color: #282c34;
+            color: white;
+            font-family: Arial, sans-serif;
+            text-align: center;
+        }
+        .score, .level, .timer {
+            position: absolute;
+            top: 10px;
+            font-size: 24px;
+        }
+        .score {
+            right: 20px;
+        }
+        .timer {
+            top: 50px;
+        }
+        #gameCanvas {
+            display: block;
+            margin: 150px auto 40px auto; /* Memberikan jarak lebih antara kotak permainan dan tombol */
+            background-color: #333;
+        }
+        .controls {
+            margin-top: 20px;
+            position: absolute;
+            bottom: 20px;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+        }
+        .btn {
+            padding: 10px 20px;
+            background: linear-gradient(to right, blue, red);
+            border: none;
+            color: black;
+            font-size: 18px;
+            cursor: pointer;
+            margin: 0 100px; /* Menambah jarak lebih banyak antar tombol */
+        }
+        .btn:hover {
+            background-color: #ff2d00;
+        }
+        
+        /* Efek Salju */
+        .snowflake {
+            position: absolute;
+            top: -10px;
+            color: white;
+            font-size: 20px;
+            opacity: 0.8;
+            user-select: none;
+            animation: fall linear infinite;
+        }
+
+        @keyframes fall {
+            to {
+                transform: translateY(100vh);
+            }
+    </style>
+</head>
+<body>
+  <div id="home-btn-container-top">
+        <button class="home-btn" onclick="goHome()">Home</button>
+      </div>
+  
+    <div class="score">Score: 0</div>
+    <div class="level">Level: 1</div>
+    <div class="timer">Time: 30</div>
+    <canvas id="gameCanvas"></canvas>
+
+    <div class="controls">
+        <button class="btn" id="leftBtn">&#8592;</button>
+        <button class="btn" id="rightBtn">&#8594;</button>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+
+        // Set canvas size (memperpanjang ke bawah lebih jauh)
+        canvas.width = 300;
+        canvas.height = 350; // Memperpanjang tinggi canvas
+
+        // Player properties (paddle)
+        const player = {
+            width: 100,  // Memperpanjang panjang kotak tangkap bola
+            height: 20,
+            x: canvas.width / 2 - 50,
+            y: canvas.height - 30,
+            speed: 5, // Kecepatan diperlamat
+            dx: 0
+        };
+
+        // Ball properties (array for multiple balls)
+        let balls = [{
+            radius: 10,
+            x: Math.random() * canvas.width,
+            y: 0,
+            speed: 1 + Math.random() * 2, // Mengurangi kecepatan bola
+            dx: 0,
+            dy: 1 + Math.random() * 2 // Mengurangi kecepatan jatuh bola
+        }];
+
+        let score = 0;
+        let level = 1;
+        let timeLeft = 30;
+
+        // Move player
+        function movePlayer() {
+            player.x += player.dx;
+            if (player.x < 0) player.x = 0;
+            if (player.x + player.width > canvas.width) player.x = canvas.width - player.width;
+        }
+
+        // Draw player with gradient (Red, Green, Blue)
+        function drawPlayer() {
+            let gradient = ctx.createLinearGradient(player.x, player.y, player.x + player.width, player.y);
+            gradient.addColorStop(0, "red");
+            gradient.addColorStop(0.5, "green");
+            gradient.addColorStop(1, "blue");
+
+            ctx.fillStyle = gradient;
+            ctx.fillRect(player.x, player.y, player.width, player.height);
+        }
+
+        // Draw balls with gradient color (Green and Yellow)
+        function drawBalls() {
+            balls.forEach(ball => {
+                // Membuat gradient untuk bola
+                let gradient = ctx.createRadialGradient(ball.x, ball.y, 0, ball.x, ball.y, ball.radius);
+                gradient.addColorStop(0, "green"); // Warna tengah
+                gradient.addColorStop(1, "yellow"); // Warna tepi
+
+                ctx.fillStyle = gradient;
+                ctx.beginPath();
+                ctx.arc(ball.x, ball.y, ball.radius, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.closePath();
+            });
+        }
+
+        // Update ball positions
+        function updateBalls() {
+            balls.forEach(ball => {
+                ball.y += ball.dy;
+
+                // Ball hits the player
+                if (ball.y + ball.radius > player.y && ball.y - ball.radius < player.y + player.height &&
+                    ball.x > player.x && ball.x < player.x + player.width) {
+                    ball.y = 0;
+                    ball.x = Math.random() * canvas.width;
+                    score++;
+                    document.querySelector('.score').textContent = `Score: ${score}`;
+                }
+
+                // Ball falls off the screen
+                if (ball.y > canvas.height) {
+                    ball.y = 0;
+                    ball.x = Math.random() * canvas.width;
+                    score--;
+                    document.querySelector('.score').textContent = `Score: ${score}`;
+                }
+            });
+        }
+
+        // Draw game
+        function draw() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            drawPlayer();
+            drawBalls();
+            updateBalls();
+            movePlayer();
+        }
+
+        // Button event listeners
+        document.getElementById('leftBtn').addEventListener('click', () => {
+            if (player.x > 0) {
+                player.dx = -player.speed; // Move left if not at the edge
+            }
+        });
+
+        document.getElementById('rightBtn').addEventListener('click', () => {
+            if (player.x + player.width < canvas.width) {
+                player.dx = player.speed; // Move right if not at the edge
+            }
+        });
+
+        // Stop player when button is released
+        document.getElementById('leftBtn').addEventListener('mouseup', () => {
+            player.dx = 0;
+        });
+
+        document.getElementById('rightBtn').addEventListener('mouseup', () => {
+            player.dx = 0;
+        });
+
+        // Leveling system and countdown timer
+        function levelUp() {
+            setInterval(() => {
+                timeLeft--;
+                document.querySelector('.timer').textContent = `Time: ${timeLeft}`;
+                if (timeLeft === 0) {
+                    level++;
+                    document.querySelector('.level').textContent = `Level: ${level}`;
+                    if (level % 2 === 0) {
+                        balls.push({
+                            radius: 10,
+                            x: Math.random() * canvas.width,
+                            y: 0,
+                            speed: 1 + Math.random() * 2, // Bola baru lebih lambat
+                            dx: 0,
+                            dy: 1 + Math.random() * 2 // Bola baru lebih lambat
+                        });
+                    }
+                    if (level === 2) {
+                        timeLeft = 40; // Increase time for level 2
+                    } else if (level === 3) {
+                        timeLeft = 60; // Increase time for level 3
+                    } else {
+                        timeLeft = 30; // Reset time for subsequent levels
+                    }
+                }
+            }, 1000);
+        }
+
+        // Game loop
+        function gameLoop() {
+            draw();
+            requestAnimationFrame(gameLoop);
+        }
+
+        // Start the level up process
+        levelUp();
+        gameLoop();
+        
+        // Efek Salju
+        function createSnowflake() {
+            const snowflake = document.createElement("div");
+            snowflake.classList.add("snowflake");
+            snowflake.innerHTML = "*"; // Mengubah dari "•" menjadi "*"
+            snowflake.style.left = Math.random() * window.innerWidth + "px";
+            snowflake.style.animationDuration = (Math.random() * 4 + 3) + "s"; // Waktu jatuh lebih lama
+            snowflake.style.fontSize = Math.random() * 15 + 15 + "px"; // Ukuran lebih besar
+            document.body.appendChild(snowflake);
+
+            setTimeout(() => {
+                snowflake.remove();
+            }, 6000);
+        }
+
+        function generateSnow() {
+            setInterval(createSnowflake, 200); // Tambah salju secara berkala
+        }
+
+        generateSnow(); // Mulai efek salju
+        
+        function goHome() {
+    window.location.href = "index.html"; // Ganti dengan halaman utama kamu
+}
+    </script>
+</body>
+</html>

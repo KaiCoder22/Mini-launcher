@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Putar Link YouTube</title>
+  <style>
+    body {
+      background: #0d0d0d;
+      color: #0ff;
+      font-family: 'Orbitron', sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+
+    .player-container {
+      width: 90%;
+      max-width: 400px;
+      background: #111;
+      border: 2px solid #0ff;
+      border-radius: 15px;
+      padding: 20px;
+      box-shadow: 0 0 20px #0ff;
+    }
+
+    h2 {
+      text-align: center;
+      margin-bottom: 15px;
+      font-size: 22px;
+    }
+
+    input[type="text"] {
+      width: 100%;
+      padding: 10px;
+      border-radius: 10px;
+      border: none;
+      background: #222;
+      color: #0ff;
+      font-size: 14px;
+    }
+
+    button {
+      margin-top: 10px;
+      width: 100%;
+      padding: 10px;
+      background: #0ff;
+      color: #000;
+      font-weight: bold;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      box-shadow: 0 0 10px #0ff;
+    }
+
+    iframe, audio {
+      margin-top: 15px;
+      width: 100%;
+      border-radius: 10px;
+    }
+
+    .player-box {
+      margin-top: 15px;
+    }
+
+    .expand-button {
+      margin-top: 10px;
+      background-color: #0ff;
+      color: #000;
+      font-weight: bold;
+      border-radius: 10px;
+      padding: 10px;
+      cursor: pointer;
+      box-shadow: 0 0 10px #0ff;
+      width: 100%;
+    }
+
+    /* Class to expand iframe/video */
+    .expanded {
+      width: 100% !important;
+      height: 400px !important;
+    }
+
+    /* Ensuring the iframe/video resizes properly */
+    .expanded-video {
+      width: 100% !important;
+      height: 400px !important;
+    }
+  </style>
+</head>
+<body>
+  <div class="player-container">
+    <h2>Pemutar Link YouTube</h2>
+    <input type="text" id="urlInput" placeholder="Tempel link disini...">
+    <button onclick="loadMedia()">Mainkan</button>
+
+    <div class="player-box" id="playerBox"></div>
+    <button class="expand-button" id="expandButton" onclick="expandVideo()">Perbesar Video</button>
+  </div>
+
+  <script>
+    function loadMedia() {
+      const url = document.getElementById("urlInput").value.trim();
+      const playerBox = document.getElementById("playerBox");
+      playerBox.innerHTML = "";
+      document.getElementById("expandButton").style.display = "block";  // Show the expand button
+
+      if (!url) return;
+
+      // YouTube
+      if (url.includes("youtube.com") || url.includes("youtu.be")) {
+        let videoId = url.split("v=")[1] || url.split("/").pop();
+        if (videoId.includes("&")) videoId = videoId.split("&")[0];
+        playerBox.innerHTML = `<iframe id="mediaPlayer" class="video" height="215" src="https://www.youtube.com/embed/${videoId}" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>`;
+      }
+      // SoundCloud
+      else if (url.includes("soundcloud.com")) {
+        playerBox.innerHTML = `<iframe id="mediaPlayer" class="video" height="160" scrolling="no" frameborder="no" allow="autoplay"
+          src="https://w.soundcloud.com/player/?url=${encodeURIComponent(url)}&color=%2300ffff&auto_play=true&hide_related=false&show_comments=true&show_user=true&show_reposts=false&show_teaser=true">
+        </iframe>`;
+      }
+      // Direct audio link (mp3/wav/etc.)
+      else if (url.match(/\.(mp3|wav|ogg)$/)) {
+        playerBox.innerHTML = `<audio controls autoplay src="${url}"></audio>`;
+        document.getElementById("expandButton").style.display = "none";  // Hide expand button for audio
+      }
+      // Tidak dikenali
+      else {
+        playerBox.innerHTML = `<p style="color: red;">Jenis link ini belum didukung!</p>`;
+        document.getElementById("expandButton").style.display = "none";  // Hide expand button if unsupported
+      }
+    }
+
+    function expandVideo() {
+      const iframe = document.getElementById("mediaPlayer");
+      iframe.classList.toggle("expanded-video");
+
+      const button = document.getElementById("expandButton");
+      if (iframe.classList.contains("expanded-video")) {
+        button.innerHTML = "Perkecil Video";
+      } else {
+        button.innerHTML = "Perbesar Video";
+      }
+    }
+  </script>
+</body>
+</html>

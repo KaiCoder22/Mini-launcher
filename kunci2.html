@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Kunci Layar</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background: #000;
+      font-family: 'Courier New', monospace;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      color: #00ff00;
+    }
+
+    .terminal {
+      background: rgba(0, 0, 0, 0.3);
+      backdrop-filter: blur(10px);
+      border: 2px solid #00ff00;
+      border-radius: 12px;
+      padding: 30px 20px;
+      width: 90%;
+      max-width: 360px;
+      text-align: center;
+      box-shadow: 0 0 20px #00ff00aa;
+    }
+
+    .terminal h2 {
+      font-size: 20px;
+      margin-bottom: 25px;
+      text-shadow: 0 0 8px #00ff00;
+    }
+
+    input[type="tel"] {
+      width: 100%;
+      padding: 12px;
+      font-size: 18px;
+      background: transparent;
+      border: none;
+      border-bottom: 2px solid #00ff00;
+      color: #00ff00;
+      outline: none;
+      caret-color: #00ff00;
+      margin-bottom: 25px;
+      text-align: center;
+    }
+
+    input::placeholder {
+      color: #00ff00aa;
+    }
+
+    button {
+      width: 100%;
+      padding: 12px;
+      background: #00ff00;
+      color: #000;
+      font-weight: bold;
+      font-size: 16px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.2s;
+      box-shadow: 0 0 10px #00ff00;
+    }
+
+    button:hover {
+      background: #00e600;
+    }
+
+    .typing-effect {
+      margin-top: 25px;
+      font-size: 14px;
+      white-space: nowrap;
+      overflow: hidden;
+      border-right: 2px solid #00ff00;
+      width: 0;
+      animation: typing 2.5s steps(30, end) forwards, blink 0.8s step-end infinite;
+    }
+
+    @keyframes typing {
+      from { width: 0 }
+      to { width: 100% }
+    }
+
+    @keyframes blink {
+      50% { border-color: transparent }
+    }
+  </style>
+</head>
+<body>
+  <div class="terminal">
+    <h2>[ AKSES TERKUNCI ]</h2>
+    <input type="tel" id="pin" placeholder="Masukkan PIN" maxlength="6">
+    <button onclick="buka()">Buka Akses</button>
+    <div class="typing-effect">Menghubungkan ke sistem utama...</div>
+  </div>
+
+  <script>
+    const PIN = "221108";
+
+    function buka() {
+      const pin = document.getElementById("pin").value;
+      if (pin === PIN) {
+        window.location.href = "masuk.html";
+      } else {
+        alert("PIN salah. Akses ditolak.");
+      }
+    }
+  </script>
+</body>
+</html>

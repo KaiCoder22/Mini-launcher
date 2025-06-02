@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Kalender</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@500&display=swap');
+
+    body {
+      margin: 0;
+      font-family: 'Orbitron', sans-serif;
+      background: #0f111a;
+      color: #00f7ff;
+    }
+
+    header {
+      text-align: center;
+      padding: 1rem;
+      background: linear-gradient(90deg, #00f7ff, #0081c9);
+      color: black;
+      font-size: 1.4rem;
+      font-weight: bold;
+      box-shadow: 0 4px 10px rgba(0,255,255,0.2);
+    }
+
+    .controls {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 0.6rem;
+      margin: 0.8rem 0;
+      font-size: 0.8rem;
+    }
+
+    .month-nav {
+      display: flex;
+      align-items: center;
+      gap: 0.3rem;
+    }
+
+    select, button {
+      background: #1b1f2f;
+      color: #00f7ff;
+      border: 1px solid #00f7ff;
+      padding: 0.2rem 0.5rem;
+      font-size: 0.7rem;
+      border-radius: 4px;
+      outline: none;
+      transition: 0.3s ease;
+    }
+
+    button:hover, select:hover {
+      background: #00f7ff;
+      color: #0f111a;
+      cursor: pointer;
+    }
+
+    .calendar {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 1px;
+      max-width: 350px;
+      margin: auto;
+      font-size: 0.65rem;
+      box-shadow: 0 0 10px rgba(0,255,255,0.2);
+    }
+
+    .day, .date {
+      padding: 0.6rem 0.3rem;
+      text-align: center;
+      background: #1b1f2f;
+      border: 1px solid #00f7ff20;
+    }
+
+    .day {
+      font-weight: bold;
+      background: #00f7ff;
+      color: #0f111a;
+    }
+
+    .date:hover {
+      background: #00f7ff20;
+      cursor: pointer;
+    }
+
+    .note {
+      font-size: 0.6rem;
+      margin-top: 0.2rem;
+      color: #86f7ff;
+    }
+
+    .modal {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0,0,0,0.7);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 999;
+    }
+
+    .modal-content {
+      background: #1b1f2f;
+      padding: 1rem;
+      width: 90%;
+      max-width: 300px;
+      border-radius: 8px;
+      box-shadow: 0 0 15px #00f7ff55;
+      color: #00f7ff;
+      font-size: 0.8rem;
+    }
+
+    .modal-content textarea {
+      width: 100%;
+      height: 80px;
+      background: #0f111a;
+      color: #00f7ff;
+      border: 1px solid #00f7ff;
+      margin-bottom: 0.8rem;
+      padding: 0.4rem;
+      font-size: 0.75rem;
+      resize: none;
+    }
+
+    .modal-content button {
+      margin: 0.2rem;
+      font-size: 0.7rem;
+    }
+    
+    .today {
+  background: #00f7ff55;
+  border: 1px solid #00f7ff;
+  font-weight: bold;
+  color: #ffffff;
+}
+  </style>
+</head>
+<body>
+  <header>Kalender</header>
+  <div class="controls">
+    <div class="month-nav">
+      <button onclick="changeMonth(-1)">&lt;&lt;</button>
+      <select id="monthSelect" onchange="renderCalendar()"></select>
+      <button onclick="changeMonth(1)">&gt;&gt;</button>
+    </div>
+    <select id="yearSelect" onchange="renderCalendar()"></select>
+  </div>
+
+  <div class="calendar" id="calendar"></div>
+
+  <div class="modal" id="noteModal">
+    <div class="modal-content">
+      <h3 id="modalDate" style="font-size: 0.9rem;"></h3>
+      <textarea id="noteInput" placeholder="Tulis catatan..."></textarea>
+      <button onclick="saveNote()">Simpan</button>
+      <button onclick="deleteNote()">Hapus</button>
+      <button onclick="closeModal()">Tutup</button>
+    </div>
+  </div>
+
+  <script>
+    const calendar = document.getElementById("calendar");
+    const noteModal = document.getElementById("noteModal");
+    const modalDate = document.getElementById("modalDate");
+    const noteInput = document.getElementById("noteInput");
+
+    let currentDate = new Date();
+    let selectedDate = null;
+
+    const days = ["Min", "Sen", "Sel", "Rab", "Kam", "Jum", "Sab"];
+    const months = ["Januari","Februari","Maret","April","Mei","Juni","Juli","Agustus","September","Oktober","November","Desember"];
+    const notes = JSON.parse(localStorage.getItem("calendarNotes") || "{}");
+
+    function renderCalendar() {
+      const year = parseInt(document.getElementById("yearSelect").value);
+      const month = parseInt(document.getElementById("monthSelect").value);
+      currentDate = new Date(year, month, 1);
+
+      calendar.innerHTML = "";
+      days.forEach(day => {
+        const dayDiv = document.createElement("div");
+        dayDiv.className = "day";
+        dayDiv.textContent = day;
+        calendar.appendChild(dayDiv);
+      });
+
+      const startDay = new Date(year, month, 1).getDay();
+      const totalDays = new Date(year, month + 1, 0).getDate();
+
+      for (let i = 0; i < startDay; i++) {
+        const empty = document.createElement("div");
+        empty.className = "date";
+        calendar.appendChild(empty);
+      }
+
+      for (let i = 1; i <= totalDays; i++) {
+        const dateDiv = document.createElement("div");
+        dateDiv.className = "date";
+        const dateKey = `${year}-${month + 1}-${i}`;
+const today = new Date();
+const isToday =
+  i === today.getDate() &&
+  month === today.getMonth() &&
+  year === today.getFullYear();
+
+if (isToday) {
+  dateDiv.classList.add("today");
+}
+        dateDiv.textContent = i;
+
+        if (notes[dateKey]) {
+          const noteEl = document.createElement("div");
+          noteEl.className = "note";
+          noteEl.textContent = notes[dateKey].slice(0, 10) + "...";
+          dateDiv.appendChild(noteEl);
+        }
+
+        dateDiv.onclick = () => openModal(dateKey);
+        calendar.appendChild(dateDiv);
+      }
+    }
+
+    function populateSelectors() {
+      const monthSelect = document.getElementById("monthSelect");
+      const yearSelect = document.getElementById("yearSelect");
+
+      months.forEach((m, i) => {
+        const opt = document.createElement("option");
+        opt.value = i;
+        opt.textContent = m;
+        monthSelect.appendChild(opt);
+      });
+
+      const yearNow = new Date().getFullYear();
+      for (let y = yearNow - 50; y <= yearNow + 50; y++) {
+        const opt = document.createElement("option");
+        opt.value = y;
+        opt.textContent = y;
+        yearSelect.appendChild(opt);
+      }
+
+      monthSelect.value = currentDate.getMonth();
+      yearSelect.value = currentDate.getFullYear();
+    }
+
+    function changeMonth(offset) {
+      const monthSelect = document.getElementById("monthSelect");
+      const yearSelect = document.getElementById("yearSelect");
+
+      let newMonth = parseInt(monthSelect.value) + offset;
+      let newYear = parseInt(yearSelect.value);
+
+      if (newMonth < 0) {
+        newMonth = 11;
+        newYear--;
+      } else if (newMonth > 11) {
+        newMonth = 0;
+        newYear++;
+      }
+
+      monthSelect.value = newMonth;
+      yearSelect.value = newYear;
+      renderCalendar();
+    }
+
+    function openModal(dateStr) {
+      selectedDate = dateStr;
+      modalDate.textContent = `Catatan untuk ${dateStr}`;
+      noteInput.value = notes[dateStr] || "";
+      noteModal.style.display = "flex";
+    }
+
+    function closeModal() {
+      noteModal.style.display = "none";
+    }
+
+    function saveNote() {
+      if (noteInput.value.trim()) {
+        notes[selectedDate] = noteInput.value.trim();
+        localStorage.setItem("calendarNotes", JSON.stringify(notes));
+      }
+      closeModal();
+      renderCalendar();
+    }
+
+    function deleteNote() {
+      if (notes[selectedDate]) {
+        delete notes[selectedDate];
+        localStorage.setItem("calendarNotes", JSON.stringify(notes));
+      }
+      closeModal();
+      renderCalendar();
+    }
+
+    populateSelectors();
+    renderCalendar();
+  </script>
+</body>
+</html>

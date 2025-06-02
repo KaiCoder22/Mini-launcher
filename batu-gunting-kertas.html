@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>Batu Gunting Kertas</title>
+  <style>
+    body {
+      background-color: #0a0f1c;
+      color: #00ffe0;
+      font-family: 'Segoe UI', sans-serif;
+      text-align: center;
+      padding: 20px;
+    }
+
+    h1 {
+      font-size: 32px;
+      margin-bottom: 10px;
+      text-shadow: 0 0 10px #00ffe0;
+    }
+
+    .score-title {
+      font-size: 20px;
+      margin: 10px 0;
+      color: #ccc;
+    }
+
+    .score-value {
+      font-size: 18px;
+      margin-bottom: 20px;
+      color: #fff;
+      background: #101522;
+      display: inline-block;
+      padding: 8px 15px;
+      border-radius: 10px;
+      box-shadow: 0 0 8px #00ffe0;
+    }
+
+    .choices img {
+      width: 60px;
+      height: 60px;
+      object-fit: cover;
+      margin: 8px;
+      cursor: pointer;
+      border-radius: 10px;
+      border: 2px solid transparent;
+      transition: transform 0.2s, border-color 0.3s;
+    }
+
+    .choices img:hover {
+      transform: scale(1.1);
+      border-color: #00ffe0;
+      box-shadow: 0 0 10px #00ffe0;
+    }
+
+    .bot-choice {
+      margin-top: 25px;
+      display: none;
+    }
+
+    .bot-choice img {
+      width: 60px;
+      height: 60px;
+      object-fit: cover;
+      border-radius: 10px;
+      border: 2px solid #00ffe0;
+      box-shadow: 0 0 10px #00ffe0;
+    }
+
+    .result-text {
+      font-size: 20px;
+      margin-top: 15px;
+      color: #00ff88;
+      text-shadow: 0 0 5px #00ff88;
+    }
+
+    .countdown {
+      font-size: 20px;
+      color: #ffaa00;
+      margin-top: 15px;
+    }
+
+    .round-info {
+      margin-top: 10px;
+      color: #88f;
+      font-size: 18px;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Batu Gunting Kertas</h1>
+  <div class="round-info" id="roundInfo">Ronde: 1 dari 10</div>
+  <div class="score-title">Score</div>
+  <div class="score-value" id="scoreDisplay">Kamu: 0 | Bot: 0</div>
+
+  <div class="choices">
+    <img src="batu.jpg" alt="Batu" onclick="startGame('batu')">
+    <img src="gunting.jpg" alt="Gunting" onclick="startGame('gunting')">
+    <img src="kertas.jpg" alt="Kertas" onclick="startGame('kertas')">
+  </div>
+
+  <div class="countdown" id="countdown"></div>
+
+  <div class="bot-choice" id="botArea">
+    <div>Bot memilih:</div>
+    <img id="botImage" src="" alt="Bot Pilihan">
+  </div>
+
+  <div class="result-text" id="resultText">Silakan pilih untuk mulai bermain</div>
+
+  <script>
+    const options = ['batu', 'gunting', 'kertas'];
+    let playerScore = 0;
+    let botScore = 0;
+    let playerHistory = [];
+
+    let round = 1;
+    let playerRoundWins = 0;
+    const MAX_ROUNDS = 10;
+    const WIN_SCORE = 5;
+
+    function getSmartBotChoice() {
+      if (playerHistory.length < 5) {
+        return options[Math.floor(Math.random() * 3)];
+      }
+
+      const count = { batu: 0, gunting: 0, kertas: 0 };
+      playerHistory.forEach(p => count[p]++);
+      const mostUsed = Object.entries(count).reduce((a, b) => a[1] > b[1] ? a : b)[0];
+
+      if (mostUsed === 'batu') return 'kertas';
+      if (mostUsed === 'kertas') return 'gunting';
+      return 'batu';
+    }
+
+    function startGame(playerChoice) {
+      if (round > MAX_ROUNDS) {
+        document.getElementById('resultText').textContent = "Permainan selesai! Kamu menang " + playerRoundWins + " dari 10 ronde.";
+        return;
+      }
+
+      document.getElementById('countdown').textContent = "Bot sedang memproses...";
+      document.getElementById('botArea').style.display = 'none';
+      document.getElementById('resultText').textContent = "";
+
+      let count = 2;
+      const countdownInterval = setInterval(() => {
+        document.getElementById('countdown').textContent = `Bot muncul dalam ${count} detik...`;
+        count--;
+        if (count < 0) {
+          clearInterval(countdownInterval);
+          play(playerChoice);
+        }
+      }, 1000);
+    }
+
+    function play(playerChoice) {
+      const botChoice = getSmartBotChoice();
+      playerHistory.push(playerChoice);
+      if (playerHistory.length > 10) playerHistory.shift();
+
+      let result;
+      if (playerChoice === botChoice) {
+        result = 'Seri!';
+      } else if (
+        (playerChoice === 'batu' && botChoice === 'gunting') ||
+        (playerChoice === 'gunting' && botChoice === 'kertas') ||
+        (playerChoice === 'kertas' && botChoice === 'batu')
+      ) {
+        result = 'Kamu Menang!';
+        playerScore++;
+      } else {
+        result = 'Bot Menang!';
+        botScore++;
+      }
+
+      document.getElementById('scoreDisplay').textContent = `Kamu: ${playerScore} | Bot: ${botScore}`;
+      document.getElementById('botImage').src = `${botChoice}.jpg`;
+      document.getElementById('botArea').style.display = 'block';
+      document.getElementById('resultText').textContent = result;
+      document.getElementById('countdown').textContent = '';
+
+      if (playerScore === WIN_SCORE || botScore === WIN_SCORE) {
+        if (playerScore === WIN_SCORE) {
+          playerRoundWins++;
+          alert(`Kamu memenangkan ronde ${round}!`);
+        } else {
+          alert(`Bot memenangkan ronde ${round}. Ulangi ronde ini.`);
+          round--; // agar tidak bertambah
+        }
+
+        round++;
+        playerScore = 0;
+        botScore = 0;
+        updateRoundDisplay();
+      }
+    }
+
+    function updateRoundDisplay() {
+      if (round <= MAX_ROUNDS) {
+        document.getElementById('roundInfo').textContent = `Ronde: ${round} dari ${MAX_ROUNDS}`;
+        document.getElementById('scoreDisplay').textContent = `Kamu: ${playerScore} | Bot: ${botScore}`;
+      } else {
+        document.getElementById('roundInfo').textContent = `Permainan selesai!`;
+      }
+    }
+  </script>
+
+</body>
+</html>

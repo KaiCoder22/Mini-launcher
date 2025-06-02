@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Kunci Layar</title>
+  <style>
+    body {
+      margin: 0;
+      height: 100vh;
+      background: radial-gradient(circle at top, #0f2027, #203a43, #2c5364);
+      font-family: 'Segoe UI', sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      color: white;
+    }
+
+    .lock-screen {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 15px;
+      width: 100%;
+      max-width: 300px;
+      padding: 20px;
+      text-align: center;
+    }
+
+    .lock-screen h1 {
+      color: #00ffff;
+      font-size: 22px;
+      margin-bottom: 10px;
+      text-shadow: 0 0 5px #00ffff;
+    }
+
+    input[type="tel"] {
+      width: 100%;
+      padding: 12px;
+      font-size: 18px;
+      text-align: center;
+      border: none;
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.08);
+      color: #fff;
+      outline: none;
+      box-shadow: 0 0 8px rgba(0,255,255,0.2);
+    }
+
+    input::placeholder {
+      color: #ccc;
+    }
+
+    button {
+      padding: 10px 0;
+      width: 100%;
+      font-size: 16px;
+      border: none;
+      border-radius: 12px;
+      background: linear-gradient(to right, #00c9a7, #005f5f);
+      color: white;
+      cursor: pointer;
+      box-shadow: 0 0 10px rgba(0,255,255,0.3);
+      transition: 0.3s;
+      margin-top: 5px;
+    }
+
+    button:hover {
+      opacity: 0.9;
+    }
+
+    .berhasil {
+      color: #00ff00;
+      font-size: 24px;
+      font-weight: bold;
+      margin-top: 20px;
+    }
+
+    .berhasil.hide {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="lock-screen">
+    <h1>Kunci Layar</h1>
+    <input type="tel" id="pin" placeholder="Masukkan PIN" maxlength="6" inputmode="numeric">
+    <button onclick="bukaKunci()">Masuk</button>
+    <div class="berhasil hide" id="berhasilMessage">Berhasil</div>
+  </div>
+
+  <script>
+    const PIN = "221120";
+
+    function bukaKunci() {
+      const input = document.getElementById("pin").value;
+      if (input === PIN) {
+        document.getElementById("berhasilMessage").classList.remove("hide");
+        localStorage.setItem("sudah_buka", "true");
+        setTimeout(() => {
+          document.getElementById("berhasilMessage").classList.add("hide");
+          window.location.href = "masuk.html";
+        }, 1500);
+      } else {
+        alert("PIN salah!");
+      }
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Bahasa Terbalik</title>
+  <style>
+    body {
+      background: #0a0a0a;
+      color: #00f7ff;
+      font-family: 'Courier New', Courier, monospace;
+      text-align: center;
+      padding: 40px 20px;
+    }
+
+    h1 {
+      font-size: 2em;
+      text-shadow: 0 0 8px #00f7ff;
+    }
+
+    textarea {
+      width: 90%;
+      max-width: 500px;
+      height: 120px;
+      padding: 10px;
+      font-size: 16px;
+      background-color: #111;
+      color: #0ff;
+      border: 2px solid #00f7ff;
+      border-radius: 8px;
+      resize: none;
+      box-shadow: 0 0 10px #00f7ff30;
+    }
+
+    button {
+      margin-top: 15px;
+      padding: 10px 20px;
+      font-size: 16px;
+      background-color: #00f7ff;
+      color: #000;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: 0.2s ease;
+      box-shadow: 0 0 8px #00f7ff;
+    }
+
+    button:hover {
+      background-color: #0ff;
+      box-shadow: 0 0 12px #00f7ff;
+    }
+
+    #output {
+      margin-top: 20px;
+      font-size: 18px;
+      white-space: pre-wrap;
+      word-wrap: break-word;
+      padding: 15px;
+      background: #111;
+      border: 1px dashed #00f7ff;
+      border-radius: 6px;
+      display: none;
+    }
+
+    #copyBtn {
+      display: none;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Bahasa Terbalik</h1>
+  <textarea id="inputText" placeholder="Ketik pesan di sini..."></textarea><br>
+  <button onclick="balikkanTeks()">Balikkan!</button>
+
+  <div id="output"></div>
+  <button id="copyBtn" onclick="salinHasil()">Salin</button>
+
+  <script>
+    function balikkanTeks() {
+      const input = document.getElementById('inputText').value;
+      const hasil = input.split('').reverse().join('');
+      const output = document.getElementById('output');
+      const salin = document.getElementById('copyBtn');
+
+      output.textContent = hasil;
+      output.style.display = 'block';
+      salin.style.display = 'inline-block';
+    }
+
+    function salinHasil() {
+      const output = document.getElementById('output');
+      navigator.clipboard.writeText(output.textContent)
+        .then(() => alert('Teks berhasil disalin!'))
+        .catch(() => alert('Gagal menyalin teks.'));
+    }
+  </script>
+</body>
+</html>

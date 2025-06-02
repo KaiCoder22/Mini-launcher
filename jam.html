@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>Jam Dunia</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@500&display=swap');
+
+    body {
+      background-color: #000;
+      color: #00ffcc;
+      font-family: 'Orbitron', sans-serif;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      height: 100vh;
+    }
+
+    .header {
+      position: absolute;
+      top: 20px;
+      left: 25px;
+      font-size: 28px;
+      color: #00ffcc;
+      font-weight: bold;
+      text-shadow: 0 0 6px #00ffcc;
+    }
+
+    .main-section {
+      margin-top: 80px;
+      text-align: center;
+    }
+
+    .clock {
+      font-size: 48px;
+      margin-bottom: 10px;
+      text-shadow: 0 0 6px #00ffcc;
+    }
+
+    .date {
+      font-size: 18px;
+      color: #0ff;
+    }
+
+    .globe {
+      font-size: 24px;
+      cursor: pointer;
+      margin-top: 30px;
+    }
+
+    select {
+      margin-top: 10px;
+      padding: 6px;
+      background-color: #111;
+      color: #00ffcc;
+      border: 1px solid #00ffcc;
+      border-radius: 6px;
+    }
+
+    .world-clock-box {
+      margin-top: 30px;
+      padding: 15px 20px;
+      border: 1px solid #00ffcc;
+      border-radius: 10px;
+      background-color: #0b0b0b;
+      min-width: 250px;
+      text-align: center;
+      box-shadow: 0 0 10px #00ffcc33;
+    }
+
+    .world-country {
+      color: #fffb00;
+      font-size: 20px;
+      margin-bottom: 5px;
+    }
+
+    .world-time {
+      color: #00ffcc;
+      font-size: 28px;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="header">Jam</div>
+
+  <div class="main-section">
+    <div class="clock" id="mainClock">00:00:00</div>
+    <div class="date" id="dateDisplay">Senin, 1 Januari 2025</div>
+  </div>
+
+  <div class="globe" onclick="toggleSelect()">🌐 Pilih Negara</div>
+
+  <select id="timezoneSelect" style="display:none;" onchange="showWorldTime()">
+    <option value="">-- Pilih Negara --</option>
+    <option value="Asia/Tokyo">Jepang</option>
+    <option value="Asia/Dubai">Uni Emirat Arab</option>
+    <option value="Europe/London">Inggris</option>
+    <option value="Europe/Berlin">Jerman</option>
+    <option value="America/New_York">Amerika Serikat (New York)</option>
+    <option value="Asia/Kolkata">India</option>
+    <option value="Australia/Sydney">Australia</option>
+    <option value="Europe/Moscow">Rusia</option>
+    <option value="America/Toronto">Kanada</option>
+    <option value="Asia/Seoul">Korea Selatan</option>
+    <option value="Asia/Shanghai">China</option>
+    <option value="America/Los_Angeles">Amerika Serikat (Los Angeles)</option>
+    <option value="Africa/Johannesburg">Afrika Selatan</option>
+    <option value="Asia/Singapore">Singapura</option>
+    <option value="Europe/Paris">Perancis</option>
+    <option value="America/Mexico_City">Meksiko</option>
+    <option value="Europe/Rome">Italia</option>
+    <option value="Asia/Jakarta">Indonesia</option>
+    <option value="Asia/Manila">Filipina</option>
+    <option value="Asia/Bangkok">Thailand</option>
+    <option value="Europe/Madrid">Spanyol</option>
+    <option value="America/Argentina/Buenos_Aires">Argentina</option>
+    <option value="Asia/Kuala_Lumpur">Malaysia</option>
+    <option value="America/Chicago">Amerika Serikat (Chicago)</option>
+    <option value="Africa/Nairobi">Kenya</option>
+    <option value="Pacific/Auckland">Selandia Baru</option>
+    <option value="Asia/Dhaka">Bangladesh</option>
+    <option value="Europe/Amsterdam">Belanda</option>
+    <option value="America/Sao_Paulo">Brasil</option>
+    <option value="Asia/Ho_Chi_Minh">Vietnam</option>
+    <option value="Europe/Brussels">Belgia</option>
+  </select>
+
+  <div class="world-clock-box" id="worldClockBox" style="display:none;">
+    <div class="world-country" id="countryName">Jepang</div>
+    <div class="world-time" id="worldClock">00:00:00</div>
+  </div>
+
+  <script>
+    function updateMainClock() {
+      const now = new Date();
+      const h = String(now.getHours()).padStart(2, '0');
+      const m = String(now.getMinutes()).padStart(2, '0');
+      const s = String(now.getSeconds()).padStart(2, '0');
+      document.getElementById("mainClock").textContent = `${h}:${m}:${s}`;
+
+      // Tanggal
+      const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+      const dateStr = now.toLocaleDateString('id-ID', options);
+      document.getElementById("dateDisplay").textContent = dateStr;
+    }
+
+    function toggleSelect() {
+      const select = document.getElementById("timezoneSelect");
+      select.style.display = select.style.display === "none" ? "block" : "none";
+    }
+
+    function showWorldTime() {
+      const tz = document.getElementById("timezoneSelect").value;
+      const selectedText = document.getElementById("timezoneSelect").selectedOptions[0].text;
+
+      if (!tz) {
+        document.getElementById("worldClockBox").style.display = "none";
+        return;
+      }
+
+      document.getElementById("countryName").textContent = selectedText;
+      document.getElementById("worldClockBox").style.display = "block";
+
+      updateWorldClock(); // Update langsung setelah dipilih
+    }
+
+    function updateWorldClock() {
+      const tz = document.getElementById("timezoneSelect").value;
+      if (!tz) return;
+
+      const now = new Date();
+      const options = {
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit',
+        timeZone: tz,
+        hour12: false
+      };
+
+      const timeStr = new Intl.DateTimeFormat('id-ID', options).format(now);
+      document.getElementById("worldClock").textContent = timeStr;
+    }
+
+    setInterval(() => {
+      updateMainClock();
+      updateWorldClock();
+    }, 1000);
+
+    updateMainClock();
+  </script>
+
+</body>
+</html>
